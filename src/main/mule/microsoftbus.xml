@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:azure-service-bus-messaging="http://www.mulesoft.org/schema/mule/azure-service-bus-messaging"
+	xmlns:servicebus="http://www.mulesoft.org/schema/mule/servicebus"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/servicebus http://www.mulesoft.org/schema/mule/servicebus/current/mule-servicebus.xsd
+http://www.mulesoft.org/schema/mule/azure-service-bus-messaging http://www.mulesoft.org/schema/mule/azure-service-bus-messaging/current/mule-azure-service-bus-messaging.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<azure-service-bus-messaging:config name="Azure_Service_Bus_Messaging_Connector_Config" doc:name="Azure Service Bus Messaging Connector Config" doc:id="a801eb2f-5124-4b00-be80-b3bf753891f1" >
+		<azure-service-bus-messaging:sas-connection namespace="apieventhubdev3weu" sharedAccessKeyName="RootManageSharedAccessKey" sharedAccessKey="pSd4AbQcZcD9qaxoLglqelV+U44QpH/lNDfS1Qr0i3Y=" />
+	</azure-service-bus-messaging:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8a409871-1d3f-4576-bfb0-d5d53a56fc34" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<!-- <flow name="microsoftbusFlow3" doc:id="5cbd4f77-a257-4141-9d5f-928b321d2925" >
+		<azure-service-bus-messaging:message-listener doc:name="Message listener" doc:id="48562132-c934-4006-a152-dd7fad7a7c7e" config-ref="Azure_Service_Bus_Messaging_Connector_Config" ackMode="AUTO" destinationName="sap-finance-v1-volatilities-poc-topic" subscriptionName="c7fc36be-2da9-4ba8-a762-f92703e9a514"/>
+		<logger level="INFO" doc:name="Logger after listener" doc:id="5654b193-1e38-463a-bb34-7a0311eba296" message="#[payload]"/>
+	</flow> -->
+	<flow name="subscribeFlow" doc:id="813247f0-9048-4100-a110-18d208ddbd1e" >
+		<azure-service-bus-messaging:message-listener doc:name="Message listener" doc:id="200581fa-8a7e-4135-a6a8-d107907963ed" config-ref="Azure_Service_Bus_Messaging_Connector_Config" ackMode="AUTO" destinationName="sap-finance-v1-volatilities-poc-topic" subscriptionName="c7fc36be-2da9-4ba8-a762-f92703e9a514"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e853e19d-17a8-404d-ae51-bcfc6b4d843a" message="#[payload]"/>
+	</flow>
+	<flow name="publishFlow" doc:id="12a20aa6-308c-4717-8918-14cae00f0477" >
+		<http:listener doc:name="Listener" doc:id="039233a7-ff17-43f2-955a-b669966e45ce" config-ref="HTTP_Listener_config" path="/que"/>
+		<azure-service-bus-messaging:send destinationName="sap-finance-v1-volatilities-poc-topic" doc:name="Send" doc:id="7c80142c-4404-480c-8a76-dab9b892fd34" config-ref="Azure_Service_Bus_Messaging_Connector_Config"/>
+	</flow>
+</mule>
